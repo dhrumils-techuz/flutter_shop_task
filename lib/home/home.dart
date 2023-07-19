@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:new_flutter_task/data/data.dart';
 import 'package:new_flutter_task/home/bloc/home_bloc.dart';
 import 'package:new_flutter_task/shop_page/ui/shop_page.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -25,7 +26,7 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     initConnectivity();
-    homeBloc.add(HomeInitialEvent());
+    homeBloc.add(HomeInitialEvent(state: 'initial'));
     _connectivitySubscription =
         _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
   }
@@ -83,7 +84,7 @@ class _HomeState extends State<Home> {
                         const Text('Please Connect to the internet'),
                         TextButton(
                           onPressed: () {
-                            homeBloc.add(HomeInitialEvent());
+                            homeBloc.add(HomeInitialEvent(state: 'reload'));
                           },
                           child: const Text('Retry'),
                         ),
@@ -106,11 +107,18 @@ class _HomeState extends State<Home> {
                           ],
                         ),
                       ),
-                      child: (ShopPage(products: successState.products)),
+                      child: (ShopPage(
+                        products: successState.products,
+                        bloc: homeBloc,
+                        pageNumber: successState.pageNumber,
+                      )),
                     ),
             );
           case HomeErrorState:
-            return const Scaffold(body: Center(child: Text('Error')));
+            return const Scaffold(
+                body: Center(
+                    child: Text(
+                        'Error! No Data Found. Please Refresh the app and start again')));
           default:
             return const Center(
               child: Text('Some Error Occured'),

@@ -26,4 +26,7 @@ class Data {
       images;
 }
 
+int skipCounter = -1;
+int skip = 25;
+
 List<Data> products = [];

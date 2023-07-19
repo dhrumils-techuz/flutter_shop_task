@@ -7,8 +7,9 @@ class HomeInitial extends HomeState {}
 
 class HomeLoadedSuccessState extends HomeState {
   final List<Data> products;
+  final int pageNumber;
 
-  HomeLoadedSuccessState({required this.products});
+  HomeLoadedSuccessState({required this.pageNumber, required this.products});
 }
 
 class HomeLoadingState extends HomeState {}

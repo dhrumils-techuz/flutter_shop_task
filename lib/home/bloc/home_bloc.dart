@@ -11,6 +11,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc() : super(HomeInitial()) {
     on<HomeEvent>((event, emit) {});
     on<HomeInitialEvent>(homeInitalEvent);
+    on<HomeErrorEvent>(homeErrorEvent);
   }
 
   FutureOr<void> homeInitalEvent(
@@ -18,17 +19,34 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     emit(HomeLoadingState());
 
     List<Data> products = [];
-    final queryParams = {'limit': '100'};
+
+    if (event.state == 'next' || event.state == 'initial') {
+      skipCounter++;
+    } else if (event.state == 'before') {
+      skipCounter--;
+      if (skipCounter == -1) {
+        emit(HomeErrorState());
+        return;
+      }
+    }
+    var abc = skipCounter * skip;
+
+    final queryParams = {'limit': '25', 'skip': abc.toString()};
 
     final url = Uri.http(
       'dummyjson.com',
       'products',
       queryParams,
     );
+
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
       final dynamic responseData = json.decode(response.body);
+      if ((responseData['products'] as List).isEmpty) {
+        emit(HomeErrorState());
+        return;
+      }
 
       List<dynamic> productList = responseData['products'];
       products = productList
@@ -49,6 +67,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     } else {
       throw Exception('Failed to fetch data');
     }
-    emit(HomeLoadedSuccessState(products: products));
+    emit(HomeLoadedSuccessState(
+        products: products, pageNumber: skipCounter - 1));
+  }
+
+  FutureOr<void> homeErrorEvent(HomeErrorEvent event, Emitter<HomeState> emit) {
+    emit(HomeErrorState());
   }
 }
