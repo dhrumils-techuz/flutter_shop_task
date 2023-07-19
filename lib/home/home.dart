@@ -111,14 +111,36 @@ class _HomeState extends State<Home> {
                         products: successState.products,
                         bloc: homeBloc,
                         pageNumber: successState.pageNumber,
+                        // status: successState.status,
                       )),
                     ),
             );
           case HomeErrorState:
-            return const Scaffold(
+            return Scaffold(
                 body: Center(
+                    child: AlertDialog(actions: [
+              Column(
+                children: [
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
                     child: Text(
-                        'Error! No Data Found. Please Refresh the app and start again')));
+                        'Error! No Data Found. Please Refresh the app and start again'),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  ElevatedButton(
+                      onPressed: () {
+                        homeBloc.add(HomeInitialEvent(state: 'before'));
+                      },
+                      child: const Text('Go Back'))
+                ],
+              ),
+            ])));
+
           default:
             return const Center(
               child: Text('Some Error Occured'),

@@ -8,3 +8,9 @@ class ProductCardClickedEvent extends ShopPageEvent {
 
   ProductCardClickedEvent(this.product);
 }
+
+class ShopPageProductLoadingEvent extends ShopPageEvent {
+  final HomeBloc bloc;
+
+  ShopPageProductLoadingEvent({required this.bloc});
+}

@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:new_flutter_task/data/data.dart';
 import 'package:http/http.dart' as http;
+import 'package:new_flutter_task/shop_page/bloc/shop_page_bloc.dart';
 part 'home_event.dart';
 part 'home_state.dart';
 
@@ -17,18 +18,24 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   FutureOr<void> homeInitalEvent(
       HomeInitialEvent event, Emitter<HomeState> emit) async {
     emit(HomeLoadingState());
+    // String status = 'initial';
+    // if (!(event.state == 'ShopPage')) {
+    // } else {
+    //   status = 'shop';
+    // }
 
-    List<Data> products = [];
-
-    if (event.state == 'next' || event.state == 'initial') {
+    if (event.state == 'next' ||
+        event.state == 'initial' ||
+        event.state == 'ShopPage') {
       skipCounter++;
     } else if (event.state == 'before') {
       skipCounter--;
-      if (skipCounter == -1) {
-        emit(HomeErrorState());
-        return;
-      }
     }
+    if (skipCounter < 0 || skipCounter > 3) {
+      emit(HomeErrorState());
+      return;
+    }
+
     var abc = skipCounter * skip;
 
     final queryParams = {'limit': '25', 'skip': abc.toString()};
@@ -49,26 +56,30 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       }
 
       List<dynamic> productList = responseData['products'];
-      products = productList
-          .map((item) => Data(
-                index: item['id'],
-                title: item['title'],
-                description: item['description'],
-                price: item['price'],
-                discountPercentage: item['discountPercentage'],
-                rating: item['rating'],
-                stock: item['stock'],
-                brand: item['brand'],
-                category: item['category'],
-                thumbnail: item['thumbnail'],
-                images: item['images'],
-              ))
-          .toList();
+      products = List.of(products)
+        ..addAll(productList
+            .map((item) => Data(
+                  index: item['id'],
+                  title: item['title'],
+                  description: item['description'],
+                  price: item['price'],
+                  discountPercentage: item['discountPercentage'],
+                  rating: item['rating'],
+                  stock: item['stock'],
+                  brand: item['brand'],
+                  category: item['category'],
+                  thumbnail: item['thumbnail'],
+                  images: item['images'],
+                ))
+            .toList());
     } else {
       throw Exception('Failed to fetch data');
     }
+
     emit(HomeLoadedSuccessState(
-        products: products, pageNumber: skipCounter - 1));
+      products: products, pageNumber: skipCounter - 1,
+      // status: status
+    ));
   }
 
   FutureOr<void> homeErrorEvent(HomeErrorEvent event, Emitter<HomeState> emit) {
