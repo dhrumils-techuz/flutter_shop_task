@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:new_flutter_task/data/data.dart';
 import 'package:new_flutter_task/home/bloc/home_bloc.dart';
+import 'package:new_flutter_task/main.dart';
 import 'package:new_flutter_task/product_page/ui/product_page.dart';
 import 'package:new_flutter_task/shop_page/bloc/shop_page_bloc.dart';
 
@@ -76,15 +77,38 @@ class _ShopPageState extends State<ShopPage> {
                           children: [
                             IconButton(
                                 onPressed: () {
-                                  homeBloc
-                                      .add(HomeInitialEvent(state: 'before'));
+                                  if (widget.pageNumber + 2 == 1) {
+                                    final snackBar = SnackBar(
+                                      content: const Text(
+                                          'Cannot Go There. Please try other option'),
+                                      action: SnackBarAction(
+                                          label: 'Ok', onPressed: () {}),
+                                    );
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(snackBar);
+                                  } else {
+                                    homeBloc
+                                        .add(HomeInitialEvent(state: 'before'));
+                                  }
                                 },
                                 icon:
                                     const Icon(Icons.navigate_before_outlined)),
                             Text('${widget.pageNumber + 2} off 4'),
                             IconButton(
                                 onPressed: () {
-                                  homeBloc.add(HomeInitialEvent(state: 'next'));
+                                  if (widget.pageNumber + 2 == 4) {
+                                    final snackBar = SnackBar(
+                                      content: const Text(
+                                          'Cannot Go There. Please try other option'),
+                                      action: SnackBarAction(
+                                          label: 'Ok', onPressed: () {}),
+                                    );
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(snackBar);
+                                  } else {
+                                    homeBloc
+                                        .add(HomeInitialEvent(state: 'next'));
+                                  }
                                 },
                                 icon: const Icon(Icons.navigate_next_outlined)),
                           ],
